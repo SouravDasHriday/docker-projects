@@ -3,11 +3,12 @@
 This repository contains hands-on Docker projects built as part of a DevOps learning journey.  
 Each project includes code, Dockerfiles, Compose files, and instructions.
 
-## 📁 Projects
+## 📂 Projects
 
 | Lab | Description |
 |-----|-------------|
-| [01-hello-docker](./01-hello-docker) | A basic Flask web app containerized with Docker |
+| [01-hello-docker](./01-hello-docker) | A basic Flask app containerized using Docker |
+| [02-docker-lamp-stack](./02-docker-lamp-stack) | LAMP stack with Apache, PHP, MySQL using Docker Compose |
 
 
 More projects coming soon...

@@ -51,6 +51,7 @@ It includes:
 
 ## Project Structure
 
+```
 02-docker-lamp-stack/
 ├── docker-compose.yml
 ├── Dockerfile
@@ -60,6 +61,7 @@ It includes:
 └── db/
 └── init.sql
 
+```
 
 ---
 

@@ -1,4 +1,4 @@
-<?php
+<?php  // <--- THIS LINE IS CRITICAL!
 // These are the details for the connection.
 // The host is 'db' because that is the name of our database service in docker-compose.yml.
 $host = 'db';

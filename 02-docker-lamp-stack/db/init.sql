@@ -4,3 +4,4 @@ CREATE TABLE products (
 );
 
 INSERT INTO products (name) VALUES ('Laptop'), ('Keyboard');
+

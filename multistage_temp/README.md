@@ -1,4 +1,6 @@
-Distroless Image Selection
+Distroless Image Selection:
+
+```bash
 --------------------------------------------------------
 Language	        Distroless Runtime
 --------------------------------------------------------
@@ -9,3 +11,6 @@ Node.js 22	      gcr.io/distroless/nodejs22-debian12
 Python	          gcr.io/distroless/python3-debian12
 Java 17	          gcr.io/distroless/java17-debian12
 Java 21	          gcr.io/distroless/java21-debian12
+
+```
+

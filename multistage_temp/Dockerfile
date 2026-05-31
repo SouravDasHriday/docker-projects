@@ -1,32 +1,25 @@
-# ========================
-# Builder
-# ========================
-FROM <builder-image> AS builder
-
+# ==========================================
+# STAGE 1: BUILD (Heavyweight)
+# ==========================================
+FROM build-image AS builder
 WORKDIR /app
 
+# Step A: Cache dependencies first (Best Practice)
+COPY dependency-files .
+RUN install-dependencies
+
+# Step B: Copy source code and compile
 COPY . .
+RUN build-command
 
-RUN <build-command>
-
-# ========================
-# Runtime
-# ========================
-FROM gcr.io/distroless/<runtime>
-
+# ==========================================
+# STAGE 2: RUNTIME (Lightweight)
+# ==========================================
+FROM runtime-image
 WORKDIR /app
 
-COPY --from=builder /app/<artifact> .
+# Step C: Copy ONLY the compiled output from Stage 1
+COPY --from=builder /app/output-artifact .
 
-# Security
-USER nonroot:nonroot
-
-# Metadata
-LABEL maintainer="your-team"
-LABEL org.opencontainers.image.source="repository"
-
-# Healthcheck handled externally
 EXPOSE 8080
-
-ENTRYPOINT ["<entrypoint>"]
-CMD ["<default-args>"]
+ENTRYPOINT ["run-command"]

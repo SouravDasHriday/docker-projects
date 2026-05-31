@@ -89,3 +89,239 @@ COPY --from=builder /app/output-artifact .
 
 EXPOSE 8080
 ENTRYPOINT ["run-command"]
+```
+
+
+## 💻 Phase 3: Language-Specific Production Templates
+
+Go
+Identify: go.mod, go.sum | Build: go build
+
+```Dockerfile
+FROM golang:1.24-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go build -o app .
+
+FROM alpine
+WORKDIR /app
+COPY --from=builder /app/app .
+EXPOSE 8080
+ENTRYPOINT ["./app"]
+```
+
+Node.js (Backend API)
+Identify: package.json, package-lock.json | Build: npm run build
+
+```Dockerfile
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 3000
+CMD ["node","dist/index.js"]
+```
+
+React / Vite (Frontend)
+Build Output: dist/
+
+```Dockerfile
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx","-g","daemon off;"]
+```
+
+Java (Maven)
+Identify: pom.xml | Build: mvn package | Output: target/*.jar
+
+```Dockerfile
+FROM maven:3.9-eclipse-temurin-21 AS builder
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY . .
+RUN mvn clean package
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+Java (Gradle)
+Identify: build.gradle | Build: gradle build
+
+```Dockerfile
+FROM gradle:jdk21 AS builder
+WORKDIR /app
+COPY . .
+RUN gradle build
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+Python (Standard PIP)
+Identify: requirements.txt
+
+```Dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["python","app.py"]
+```
+
+# FastAPI Example: CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]
+Python (Poetry)
+Identify: pyproject.toml
+
+```Dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install poetry
+COPY pyproject.toml poetry.lock* ./
+RUN poetry install --no-root
+COPY . .
+CMD ["poetry","run","python","main.py"]
+```
+
+Rust
+Identify: Cargo.toml | Build: cargo build --release
+
+```Dockerfile
+FROM rust:latest AS builder
+WORKDIR /app
+COPY . .
+RUN cargo build --release
+
+FROM debian:bookworm-slim
+WORKDIR /app
+COPY --from=builder /app/target/release/app .
+ENTRYPOINT ["./app"]
+```
+
+C# / .NET
+Identify: *.csproj | Build: dotnet publish
+
+```Dockerfile
+FROM [mcr.microsoft.com/dotnet/sdk:9.0](https://mcr.microsoft.com/dotnet/sdk:9.0) AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app
+
+FROM [mcr.microsoft.com/dotnet/aspnet:9.0](https://mcr.microsoft.com/dotnet/aspnet:9.0)
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet","MyApp.dll"]
+```
+
+PHP Laravel
+Identify: composer.json
+
+```Dockerfile
+FROM composer:latest AS builder
+WORKDIR /app
+COPY . .
+RUN composer install --no-dev
+
+FROM php:8.3-apache
+COPY --from=builder /app /var/www/html
+```
+
+Ruby on Rails
+Identify: Gemfile
+
+```Dockerfile
+FROM ruby:3.4
+WORKDIR /app
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+COPY . .
+CMD ["rails","server","-b","0.0.0.0"]
+```
+
+
+🔎 Phase 4: ENV vs CMD vs ENTRYPOINT Detection
+How to look at application code and know what Dockerfile commands to use:
+
+Search for Environment Variables
+
+Go: ``` os.Getenv()```
+
+Java: ``` System.getenv()```
+
+Node: ```process.env```
+
+Python: ```os.environ```
+
+.NET: ```Environment.GetEnvironmentVariable()```
+If found, ENV SOME_VAR=value may be needed.
+
+Search for Command Line Arguments
+
+Go: ```flag.String(), flag.Parse()```
+
+Java: ```args[]```
+
+Node:``` process.argv```
+
+Python: ```argparse, sys.argv```
+If found, CMD ["--port=8080"] may be appropriate.
+
+The Golden Rule:
+
+```ENTRYPOINT```: The executable that must run (e.g., ```["./app"]```).
+
+CMD: Default arguments passed to the Entrypoint, which can be easily overridden by the user (e.g., ["--port=8080"]).
+
+
+🚀 Phase 5: Production Best Practices Checklist
+Always try to:
+
+✅ Use multi-stage builds
+
+✅ Copy only required files (dependency cache trick)
+
+✅ Use Alpine/slim runtime images when possible
+
+✅ Run as non-root user (advanced but recommended)
+
+✅ Add .dockerignore
+
+✅ Separate build stage and runtime stage
+
+✅ Prefer ENTRYPOINT for applications
+
+✅ Use CMD for default arguments
+
+A common production pattern is:
+
+```bash
+ENTRYPOINT ["./app"]
+CMD ["--port=8080"]
+```
+
+

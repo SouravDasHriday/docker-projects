@@ -90,7 +90,7 @@ COPY --from=builder /app/output-artifact .
 EXPOSE 8080
 ENTRYPOINT ["run-command"]
 ```
-
+---
 
 ## 💻 Phase 3: Language-Specific Production Templates
 
@@ -262,9 +262,9 @@ RUN bundle install
 COPY . .
 CMD ["rails","server","-b","0.0.0.0"]
 ```
+---
 
-
-🔎 Phase 4: ENV vs CMD vs ENTRYPOINT Detection
+## 🔎 Phase 4: ENV vs CMD vs ENTRYPOINT Detection
 How to look at application code and know what Dockerfile commands to use:
 
 Search for Environment Variables
@@ -297,8 +297,10 @@ The Golden Rule:
 
 CMD: Default arguments passed to the Entrypoint, which can be easily overridden by the user (e.g., ["--port=8080"]).
 
+---
 
-🚀 Phase 5: Production Best Practices Checklist
+
+## 🚀 Phase 5: Production Best Practices Checklist
 Always try to:
 
 ✅ Use multi-stage builds

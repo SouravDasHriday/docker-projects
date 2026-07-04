@@ -12,8 +12,8 @@ Each project includes code, Dockerfiles, Compose files, and instructions.
 | [03-simple-java-app](./03-simple-java-app) | Simple java app with multi-stage docker file |
 | [04-flask-app](./04-flask-app) | Simple flask app in docker container |
 | [05-nodejs-todo-app](./05-nodejs-todo-app) | Nodejs based todo app in docker container |
+| [06-network-project-2-tier-application](./06-network-project-2-tier-application) | 2 tier flusk app in docker container |
 | [multistage_temp](./multistage_temp) | Universal template of Multi Stage Dockerfile & some shortcut |
-
 
 
 More projects coming soon...

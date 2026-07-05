@@ -1,0 +1,51 @@
+#version: "3.8"
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "devops"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql # my custom volume name "mysql-data"
+    networks:
+      - two-tier # my custom network name "two-tier"
+    restart: always # restart the container if it crashes
+    healthcheck: # healthcheck to check if the mysql service is up and running
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  flask:
+    build:
+      context: .
+    container_name: two-tier-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - two-tier # my custom network name "two-tier"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: devops
+
+    depends_on: # two-tire application, flask service depends on mysql service untill mysql service is not ready
+      - mysql
+    restart: always # restart the container if it crashes
+    healthcheck: # healthcheck to check if the flask service is up and running
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+# My custom network name "two-tier" to connect both services
+networks:
+  two-tier:
+# My custom volume name "mysql-data" to persist MySQL data
+volumes:
+  mysql-data:

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App new🚀</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Import Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -23,15 +24,22 @@
             color: #fff;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             padding: 20px;
         }
 
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
         /* Glassmorphic Container */
         .container {
-            max-width: 600px;
-            width: 100%;
             padding: 30px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -47,11 +55,36 @@
             box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
         }
 
+        /* Metrics Container */
+        .metrics-container {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metrics-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
+        }
+
         /* Elegant Heading */
         h1 {
             font-size: 2rem;
             font-weight: 600;
             background: linear-gradient(135deg, #ff9800, #e65100);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
@@ -63,7 +96,7 @@
             padding: 15px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
@@ -86,6 +119,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             text-align: center;
+            margin-bottom: 10px;
         }
 
         input[type="text"]:focus {
@@ -112,9 +146,89 @@
             transform: translateY(-2px);
         }
 
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-card .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #aaa;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-card .value {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 5px 0;
+            color: #fff;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .metric-bar-fill.cpu { background: linear-gradient(90deg, #60a5fa, #a78bfa); }
+        .metric-bar-fill.memory { background: linear-gradient(90deg, #34d399, #6ee7b7); }
+        .metric-bar-fill.disk { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 15px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #6ee7b7;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .live-status {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
         /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 600px) {
-            .container {
+            .container, .metrics-container {
                 padding: 20px;
             }
 
@@ -122,35 +236,164 @@
                 font-size: 1.6rem;
             }
 
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
             input[type="text"], input[type="submit"] {
                 font-size: 14px;
             }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Flask + MySQL App [2 tier] - Sourav Das 🔥</h1>
+    <div class="main-container">
+        <!-- Left: Message Board -->
+        <div class="container">
+            <h1>Flask + MySQL App [2 tier] - Sourav Das 🔥</h1>
 
-        <div class="messages">
-            {% for message in messages %}
-                <p>{{ message[0] }}</p>
-            {% endfor %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message[0] }}</p>
+                {% endfor %}
+            </div>
+
+            <form id="messageForm">
+                <input type="text" name="new_message" placeholder="Type your message..." required>
+                <input type="submit" value="Send">
+            </form>
         </div>
 
-        <form id="messageForm">
-            <input type="text" name="new_message" placeholder="Type your message..." required>
-            <input type="submit" value="Send">
-        </form>
+        <!-- Right: System Metrics -->
+        <div class="metrics-container">
+            <h2>📊 System Metrics</h2>
+            <div class="live-status">
+                <span class="status-dot"></span> Live Updates
+                <span style="margin-left: 15px; font-size: 11px;" id="refreshTime">Updated: just now</span>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-microchip"></i> CPU</div>
+                    <div class="value" id="cpuValue">0%</div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill cpu" id="cpuBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-memory"></i> Memory</div>
+                    <div class="value" id="ramValue">0%</div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill memory" id="ramBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-hdd"></i> Disk</div>
+                    <div class="value" id="diskValue">0%</div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill disk" id="diskBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-clock"></i> Uptime</div>
+                    <div class="value" id="uptimeValue">0h</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="metricsChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- jQuery for Smooth AJAX Requests -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Initialize chart
+        const ctx = document.getElementById('metricsChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'CPU',
+                        data: [],
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'RAM',
+                        data: [],
+                        borderColor: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#d4d9e6',
+                            font: { size: 10 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa',
+                            font: { size: 9 }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa',
+                            font: { size: 8 },
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        });
+
+        // Message form submission
         $(document).ready(function() {
             $("#messageForm").on("submit", function(event) {
-                event.preventDefault(); // Prevent page reload
+                event.preventDefault();
 
                 let messageInput = $("input[name='new_message']");
                 let message = messageInput.val().trim();
@@ -165,9 +408,11 @@
                     type: "POST",
                     data: { new_message: message },
                     success: function(response) {
-                        if (response && response.message) {
+                        if (response && response.success) {
                             $(".messages").append("<p>" + response.message + "</p>");
                             messageInput.val("");
+                            // Scroll to bottom
+                            $(".messages").scrollTop($(".messages")[0].scrollHeight);
                         } else {
                             console.error("Unexpected response format:", response);
                         }
@@ -178,6 +423,46 @@
                 });
             });
         });
+
+        // Update metrics
+        function updateMetrics() {
+            fetch('/api/metrics')
+                .then(response => response.json())
+                .then(data => {
+                    // Update stats
+                    document.getElementById('cpuValue').textContent = data.cpu.percent + '%';
+                    document.getElementById('cpuBar').style.width = data.cpu.percent + '%';
+
+                    document.getElementById('ramValue').textContent = data.ram.percent + '%';
+                    document.getElementById('ramBar').style.width = data.ram.percent + '%';
+
+                    document.getElementById('diskValue').textContent = data.disk.percent + '%';
+                    document.getElementById('diskBar').style.width = data.disk.percent + '%';
+
+                    const uptime = data.uptime;
+                    let uptimeStr = '';
+                    if (uptime.days > 0) uptimeStr += uptime.days + 'd ';
+                    if (uptime.hours > 0) uptimeStr += uptime.hours + 'h ';
+                    uptimeStr += uptime.minutes + 'm';
+                    document.getElementById('uptimeValue').textContent = uptimeStr;
+
+                    // Update chart
+                    const history = data.history;
+                    chart.data.labels = history.timestamps;
+                    chart.data.datasets[0].data = history.cpu;
+                    chart.data.datasets[1].data = history.ram;
+                    chart.update();
+
+                    // Update refresh time
+                    document.getElementById('refreshTime').textContent =
+                        'Updated: ' + new Date().toLocaleTimeString();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Update every 2 seconds
+        setInterval(updateMetrics, 2000);
+        updateMetrics();
     </script>
 </body>
 

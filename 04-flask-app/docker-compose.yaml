@@ -1,5 +1,8 @@
 services:
   flask-app:
     build: .
+    container_name: my-flask-container
     ports:
       - "80:80"
+    environment:
+      - FLASK_DEBUG=1

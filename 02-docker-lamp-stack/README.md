@@ -1,7 +1,7 @@
 # Lab 02: Docker LAMP Stack 🐳🔥
 
 A simple but powerful **LAMP stack** (Linux + Apache + MySQL + PHP) setup using **Docker Compose**.
-This lab teaches you how to containerize a PHP web app that connects to a MySQL database and run both using Docker.
+This lab teaches how to containerize a PHP web app that connects to a MySQL database and run both using Docker.
 
 ---
 

@@ -1,6 +1,6 @@
 services:
   flask-app:
-    build: .
+    image: souravdasdocker/flusk-app:latest
     container_name: my-flask-container
     ports:
       - "80:80"
